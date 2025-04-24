@@ -244,6 +244,8 @@ class TABFile final : public IMapInfoFile
     int WriteTABFile();
 
   public:
+    //! Nastavi prisilni zapis NonEarth koordinatnega sistema
+	void SetForceNonEarth(bool bForce);
     explicit TABFile(GDALDataset *poDS);
     virtual ~TABFile();
 
@@ -376,6 +378,10 @@ class TABFile final : public IMapInfoFile
 #ifdef DEBUG
     virtual void Dump(FILE *fpOut = nullptr) override;
 #endif
+
+  protected:
+    //! Če je true, se bo zapisala "CoordSys NonEarth"
+    bool m_bForceNonEarth = false;
 };
 
 /*---------------------------------------------------------------------

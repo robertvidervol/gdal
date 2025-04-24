@@ -350,6 +350,12 @@ OGRTABDataSource::ICreateLayer(const char *pszLayerName,
                     .c_str());
 
             TABFile *poTABFile = new TABFile(this);
+			
+           const char* pszForceCoordSys = CSLFetchNameValue(papszOptions, "FORCE_COORDSYS");
+           if (pszForceCoordSys && EQUAL(pszForceCoordSys, "NONEARTH"))
+        {
+               poTABFile->SetForceNonEarth(true);
+        }
 
             if (poTABFile->Open(pszFullFilename, TABWrite, FALSE, m_nBlockSize,
                                 pszCharset) != 0)

@@ -15,6 +15,8 @@
  * SPDX-License-Identifier: MIT
  **********************************************************************/
 
+#include "cpl_string.h"
+
 #include "cpl_port.h"
 #include "mitab.h"
 
@@ -3114,6 +3116,33 @@ int TABFile::SetSpatialRef(OGRSpatialReference *poSpatialRef)
                  "SetSpatialRef() failed: Called with NULL poSpatialRef.");
         return -1;
     }
+
+   int TABFile::SetSpatialRef(OGRSpatialReference* poSpatialRef)
+{
+    if (m_bForceNonEarth)
+    {
+        OGRSpatialReference oNonEarthSpatialRef;
+        oNonEarthSpatialRef.SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
+        oNonEarthSpatialRef.SetWellKnownGeogCS("Nonearth");
+
+        poSpatialRef = &oNonEarthSpatialRef;
+    }
+
+    if (poSpatialRef)
+    {
+        m_poSpatialRef = poSpatialRef->Clone();  // Shrani lokalno kopijo
+
+        // Pretvori v TABProjInfo in nastavi
+        TABProjInfo sTABProj;
+        int nParamCount = 0;
+        TABFileGetTABProjFromSpatialRef(poSpatialRef, sTABProj, nParamCount);
+        if (SetProjInfo(&sTABProj) != 0)
+            return -1;
+    }
+
+    return 0;
+}
+
 
     /*-----------------------------------------------------------------
      * Keep a copy of the OGRSpatialReference...
